@@ -1,5 +1,6 @@
 package net.learning.SpringSecurityBasicAuth.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -20,6 +22,15 @@ import java.util.List;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig  {
+
+    @Value("${app.security.username}")
+    private String userName;
+
+    @Value("${app.security.password}")
+    private String password;
+
+    @Value("${app.security.role}")
+    private String role;
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,8 +51,12 @@ public class SecurityConfig  {
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-        //return new BCryptPasswordEncoder(10);
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(password);
+        System.out.print("Encoded Password : "+encodedPassword);
+        password = encodedPassword;
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean
